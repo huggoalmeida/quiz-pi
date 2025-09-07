@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz PI & Inovação Expandido</title>
+<style>body{font-family:Arial,sans-serif;margin:20px} .option{margin:6px;padding:8px;border:1px solid #ccc;border-radius:8px;cursor:pointer}</style>
+</head>
+<body>
+<h2>Quiz PI & Inovação — Versão Expandida</h2>
+<div id="quiz"></div>
+<script>
+const QUESTIONS=[
+  {id:'q1',prompt:'Segundo o Manual de Oslo, inovação é definida como?',options:['Ideia nova','Mudança sazonal','Implementação de produto/processo/método novo ou melhorado','Só patentes registradas'],answerIndex:2,explanation:'Definição oficial.',difficulty:2,tags:['Inovação'],source:'Manual de Oslo'}
+];
+
+// adicionar 50 extras
+QUESTIONS.push({id:'extra-0',prompt:'Questão extra gerada nº 1 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 1.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-1',prompt:'Questão extra gerada nº 2 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 2.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-2',prompt:'Questão extra gerada nº 3 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 3.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-3',prompt:'Questão extra gerada nº 4 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 4.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-4',prompt:'Questão extra gerada nº 5 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 5.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-5',prompt:'Questão extra gerada nº 6 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 6.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-6',prompt:'Questão extra gerada nº 7 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 7.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-7',prompt:'Questão extra gerada nº 8 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 8.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-8',prompt:'Questão extra gerada nº 9 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 9.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-9',prompt:'Questão extra gerada nº 10 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 10.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-10',prompt:'Questão extra gerada nº 11 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 11.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-11',prompt:'Questão extra gerada nº 12 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 12.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-12',prompt:'Questão extra gerada nº 13 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 13.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-13',prompt:'Questão extra gerada nº 14 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 14.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-14',prompt:'Questão extra gerada nº 15 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 15.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-15',prompt:'Questão extra gerada nº 16 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 16.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-16',prompt:'Questão extra gerada nº 17 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 17.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-17',prompt:'Questão extra gerada nº 18 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 18.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-18',prompt:'Questão extra gerada nº 19 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 19.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-19',prompt:'Questão extra gerada nº 20 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 20.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-20',prompt:'Questão extra gerada nº 21 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 21.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-21',prompt:'Questão extra gerada nº 22 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 22.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-22',prompt:'Questão extra gerada nº 23 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 23.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-23',prompt:'Questão extra gerada nº 24 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 24.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-24',prompt:'Questão extra gerada nº 25 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 25.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-25',prompt:'Questão extra gerada nº 26 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 26.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-26',prompt:'Questão extra gerada nº 27 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 27.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-27',prompt:'Questão extra gerada nº 28 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 28.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-28',prompt:'Questão extra gerada nº 29 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 29.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-29',prompt:'Questão extra gerada nº 30 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 30.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-30',prompt:'Questão extra gerada nº 31 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 31.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-31',prompt:'Questão extra gerada nº 32 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 32.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-32',prompt:'Questão extra gerada nº 33 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 33.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-33',prompt:'Questão extra gerada nº 34 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 34.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-34',prompt:'Questão extra gerada nº 35 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 35.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-35',prompt:'Questão extra gerada nº 36 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 36.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-36',prompt:'Questão extra gerada nº 37 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 37.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-37',prompt:'Questão extra gerada nº 38 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 38.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-38',prompt:'Questão extra gerada nº 39 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 39.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-39',prompt:'Questão extra gerada nº 40 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 40.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-40',prompt:'Questão extra gerada nº 41 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 41.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-41',prompt:'Questão extra gerada nº 42 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 42.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-42',prompt:'Questão extra gerada nº 43 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 43.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-43',prompt:'Questão extra gerada nº 44 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 44.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-44',prompt:'Questão extra gerada nº 45 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 45.',difficulty:5,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-45',prompt:'Questão extra gerada nº 46 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 46.',difficulty:1,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-46',prompt:'Questão extra gerada nº 47 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 47.',difficulty:2,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-47',prompt:'Questão extra gerada nº 48 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 48.',difficulty:3,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-48',prompt:'Questão extra gerada nº 49 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 49.',difficulty:4,tags:['Extra'],source:'Expansão'});
+QUESTIONS.push({id:'extra-49',prompt:'Questão extra gerada nº 50 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 50.',difficulty:5,tags:['Extra'],source:'Expansão'});
+
+let current=0;
+function render(){
+  if(current>=QUESTIONS.length){document.getElementById('quiz').innerHTML='Fim do quiz';return;}
+  const q=QUESTIONS[current];
+  let html='<div><b>'+q.prompt+'</b></div>';
+  q.options.forEach((opt,i)=>{
+    html+='<div class="option" onclick="check('+i+')">'+String.fromCharCode(65+i)+'. '+opt+'</div>';
+  });
+  document.getElementById('quiz').innerHTML=html;
+}
+function check(i){
+  const q=QUESTIONS[current];
+  let msg='';
+  if(i===q.answerIndex){msg='✅ Correto!';} else {msg='❌ Errado. Correto: '+String.fromCharCode(65+q.answerIndex);}
+  msg+='<br>'+q.explanation+'<br><button onclick="next()">Próxima</button>';
+  document.getElementById('quiz').innerHTML=msg;
+}
+function next(){current++;render();}
+render();
+</script>
+</body>
+</html>
