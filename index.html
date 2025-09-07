@@ -1,90 +1,503 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quiz PI & Inovação Expandido</title>
-<style>body{font-family:Arial,sans-serif;margin:20px} .option{margin:6px;padding:8px;border:1px solid #ccc;border-radius:8px;cursor:pointer}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Propriedade Intelectual e Inovação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation; 
+        }
+        .duo-button {
+            transition: all 0.2s ease-in-out;
+            transform: translateY(0);
+            box-shadow: 0 5px 0 #e0e0e0;
+        }
+        .duo-button.selected, .duo-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #c0c0c0;
+        }
+        .duo-button.correct {
+            background-color: #58CC02 !important;
+            color: white !important;
+            border-color: #4CAF50 !important;
+            box-shadow: 0 5px 0 #4aab02;
+        }
+        .duo-button.incorrect {
+            background-color: #FF4B4B !important;
+            color: white !important;
+            border-color: #E53E3E !important;
+            box-shadow: 0 5px 0 #d44141;
+        }
+        .feedback-correct {
+            border-color: #58CC02;
+            color: #58CC02;
+        }
+        .feedback-incorrect {
+            border-color: #FF4B4B;
+            color: #FF4B4B;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        #fullscreen-error-msg {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
 </head>
-<body>
-<h2>Quiz PI & Inovação — Versão Expandida</h2>
-<div id="quiz"></div>
-<script>
-const QUESTIONS=[
-  {id:'q1',prompt:'Segundo o Manual de Oslo, inovação é definida como?',options:['Ideia nova','Mudança sazonal','Implementação de produto/processo/método novo ou melhorado','Só patentes registradas'],answerIndex:2,explanation:'Definição oficial.',difficulty:2,tags:['Inovação'],source:'Manual de Oslo'}
-];
+<body class="bg-gray-100">
+    <!-- Botão de Tela Cheia -->
+    <button id="fullscreen-btn" class="fixed top-4 right-4 z-10 p-2 rounded-full bg-white/50 hover:bg-gray-200 transition">
+        <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        <svg id="exit-fullscreen-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 hidden"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3M3 16h3a2 2 0 0 0 2-2v-3"></path></svg>
+    </button>
+    
+    <!-- Mensagem de Erro para Tela Cheia -->
+    <div id="fullscreen-error-msg" class="hidden fixed top-16 right-4 z-20 p-4 rounded-xl bg-red-100 border border-red-300 text-red-800 shadow-lg opacity-0">
+        <p class="font-bold">Tela Cheia Indisponível</p>
+        <p class="text-sm">Este ambiente não permite o modo tela cheia.<br>Para a melhor experiência, copie o código para um arquivo .html.</p>
+    </div>
 
-// adicionar 50 extras
-QUESTIONS.push({id:'extra-0',prompt:'Questão extra gerada nº 1 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 1.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-1',prompt:'Questão extra gerada nº 2 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 2.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-2',prompt:'Questão extra gerada nº 3 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 3.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-3',prompt:'Questão extra gerada nº 4 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 4.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-4',prompt:'Questão extra gerada nº 5 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 5.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-5',prompt:'Questão extra gerada nº 6 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 6.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-6',prompt:'Questão extra gerada nº 7 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 7.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-7',prompt:'Questão extra gerada nº 8 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 8.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-8',prompt:'Questão extra gerada nº 9 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 9.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-9',prompt:'Questão extra gerada nº 10 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 10.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-10',prompt:'Questão extra gerada nº 11 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 11.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-11',prompt:'Questão extra gerada nº 12 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 12.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-12',prompt:'Questão extra gerada nº 13 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 13.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-13',prompt:'Questão extra gerada nº 14 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 14.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-14',prompt:'Questão extra gerada nº 15 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 15.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-15',prompt:'Questão extra gerada nº 16 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 16.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-16',prompt:'Questão extra gerada nº 17 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 17.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-17',prompt:'Questão extra gerada nº 18 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 18.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-18',prompt:'Questão extra gerada nº 19 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 19.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-19',prompt:'Questão extra gerada nº 20 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 20.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-20',prompt:'Questão extra gerada nº 21 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 21.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-21',prompt:'Questão extra gerada nº 22 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 22.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-22',prompt:'Questão extra gerada nº 23 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 23.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-23',prompt:'Questão extra gerada nº 24 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 24.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-24',prompt:'Questão extra gerada nº 25 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 25.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-25',prompt:'Questão extra gerada nº 26 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 26.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-26',prompt:'Questão extra gerada nº 27 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 27.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-27',prompt:'Questão extra gerada nº 28 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 28.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-28',prompt:'Questão extra gerada nº 29 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 29.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-29',prompt:'Questão extra gerada nº 30 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 30.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-30',prompt:'Questão extra gerada nº 31 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 31.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-31',prompt:'Questão extra gerada nº 32 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 32.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-32',prompt:'Questão extra gerada nº 33 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 33.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-33',prompt:'Questão extra gerada nº 34 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 34.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-34',prompt:'Questão extra gerada nº 35 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 35.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-35',prompt:'Questão extra gerada nº 36 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 36.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-36',prompt:'Questão extra gerada nº 37 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 37.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-37',prompt:'Questão extra gerada nº 38 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 38.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-38',prompt:'Questão extra gerada nº 39 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 39.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-39',prompt:'Questão extra gerada nº 40 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 40.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-40',prompt:'Questão extra gerada nº 41 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 41.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-41',prompt:'Questão extra gerada nº 42 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 42.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-42',prompt:'Questão extra gerada nº 43 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 43.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-43',prompt:'Questão extra gerada nº 44 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 44.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-44',prompt:'Questão extra gerada nº 45 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 45.',difficulty:5,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-45',prompt:'Questão extra gerada nº 46 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 46.',difficulty:1,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-46',prompt:'Questão extra gerada nº 47 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:2,explanation:'Explicação da questão extra 47.',difficulty:2,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-47',prompt:'Questão extra gerada nº 48 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:3,explanation:'Explicação da questão extra 48.',difficulty:3,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-48',prompt:'Questão extra gerada nº 49 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:0,explanation:'Explicação da questão extra 49.',difficulty:4,tags:['Extra'],source:'Expansão'});
-QUESTIONS.push({id:'extra-49',prompt:'Questão extra gerada nº 50 sobre PI/Inovação.',options:['Alternativa A','Alternativa B','Alternativa C','Alternativa D'],answerIndex:1,explanation:'Explicação da questão extra 50.',difficulty:5,tags:['Extra'],source:'Expansão'});
 
-let current=0;
-function render(){
-  if(current>=QUESTIONS.length){document.getElementById('quiz').innerHTML='Fim do quiz';return;}
-  const q=QUESTIONS[current];
-  let html='<div><b>'+q.prompt+'</b></div>';
-  q.options.forEach((opt,i)=>{
-    html+='<div class="option" onclick="check('+i+')">'+String.fromCharCode(65+i)+'. '+opt+'</div>';
-  });
-  document.getElementById('quiz').innerHTML=html;
-}
-function check(i){
-  const q=QUESTIONS[current];
-  let msg='';
-  if(i===q.answerIndex){msg='✅ Correto!';} else {msg='❌ Errado. Correto: '+String.fromCharCode(65+q.answerIndex);}
-  msg+='<br>'+q.explanation+'<br><button onclick="next()">Próxima</button>';
-  document.getElementById('quiz').innerHTML=msg;
-}
-function next(){current++;render();}
-render();
-</script>
+    <div id="app-container" class="w-full max-w-2xl mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-center min-h-screen">
+        
+        <!-- Tela Inicial -->
+        <div id="start-screen" class="text-center">
+            <h1 class="text-4xl font-black text-gray-800 mb-4">Quiz de Inovação e PI</h1>
+            <p class="text-lg text-gray-600 mb-8">Teste seus conhecimentos sobre patentes, marcas, direito autoral e inovação.</p>
+            <button id="start-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg transform hover:scale-105 transition-transform">
+                Começar o Desafio
+            </button>
+        </div>
+
+        <!-- Tela do Quiz -->
+        <div id="quiz-screen" class="hidden">
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2 text-gray-600 font-bold">
+                    <span>Nível: <span id="level-display">1</span></span>
+                    <span>Pontos: <span id="score-display">0</span></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progress-bar" class="bg-green-500 h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-6">Carregando pergunta...</h2>
+                <div id="answer-options" class="space-y-4">
+                    <!-- Opções de resposta serão inseridas aqui -->
+                </div>
+            </div>
+
+            <div id="feedback-section" class="mt-6 min-h-[120px]">
+                <!-- Feedback será inserido aqui -->
+            </div>
+
+            <button id="confirm-button" class="w-full mt-6 bg-gray-300 text-gray-500 font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg cursor-not-allowed" disabled>
+                Verificar
+            </button>
+        </div>
+        
+        <!-- Tela Final -->
+        <div id="end-screen" class="hidden text-center">
+             <h1 class="text-4xl font-black text-gray-800 mb-4">Desafio Concluído!</h1>
+            <p class="text-2xl text-gray-600 mb-8">Sua pontuação final foi: <span id="final-score" class="font-bold">0</span></p>
+            <button id="restart-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg transform hover:scale-105 transition-transform">
+                Jogar Novamente
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const questionBank = [
+            // Dificuldade 1: Conceitos Básicos
+            {
+                question: "O que é uma patente, de acordo com a legislação brasileira?",
+                options: [
+                    { text: "Um título de propriedade temporária para uma invenção ou modelo de utilidade.", correct: true, rationale: "Correto! A patente protege uma invenção com aplicação industrial por um tempo limitado, garantindo exclusividade ao inventor." },
+                    { text: "Um registro que protege a aparência de um produto.", correct: false, rationale: "Incorreto. A proteção da aparência (design) é feita pelo Desenho Industrial." },
+                    { text: "O direito exclusivo de usar uma marca comercial.", correct: false, rationale: "Incorreto. Esse direito é conferido pelo Registro de Marca." },
+                    { text: "Uma autorização para copiar obras artísticas.", correct: false, rationale: "Incorreto. Isso se relaciona com o Direito Autoral, que na verdade protege contra cópias não autorizadas." }
+                ],
+                difficulty: 1
+            },
+            {
+                question: "Qual é a principal função de uma marca registrada?",
+                options: [
+                    { text: "Proteger o funcionamento técnico de um produto.", correct: false, rationale: "Incorreto. A funcionalidade técnica é protegida por patente." },
+                    { text: "Identificar e distinguir produtos/serviços de uma empresa no mercado.", correct: true, rationale: "Correto! A marca é o sinal que conecta o produto à sua origem, ajudando o consumidor a identificá-lo." },
+                    { text: "Garantir direitos sobre uma obra literária.", correct: false, rationale: "Incorreto. Obras literárias são protegidas pelo Direito Autoral." },
+                    { text: "Proteger o design de uma embalagem.", correct: false, rationale: "Incorreto. O design é protegido pelo Desenho Industrial, embora a embalagem possa, em alguns casos, ser registrada como marca tridimensional." }
+                ],
+                difficulty: 1
+            },
+            {
+                question: "O Direito Autoral protege principalmente:",
+                options: [
+                    { text: "A expressão de criações literárias, artísticas e científicas.", correct: true, rationale: "Correto! O direito autoral protege a forma como uma ideia é expressa (um livro, uma música), não a ideia em si." },
+                    { text: "Ideias e conceitos abstratos.", correct: false, rationale: "Incorreto. Ideias, por si sós, não são protegidas. A proteção recai sobre a sua materialização." },
+                    { text: "Invenções com aplicação industrial.", correct: false, rationale: "Incorreto. Invenções são objeto de patente." },
+                    { text: "Nomes de empresas e produtos.", correct: false, rationale: "Incorreto. Nomes e logotipos são protegidos pelo registro de marca." }
+                ],
+                difficulty: 1
+            },
+            {
+                question: "Qual é o principal foco da proteção por Desenho Industrial?",
+                options: [
+                    { text: "O funcionamento do produto.", correct: false, rationale: "Incorreto. A funcionalidade é matéria de patente." },
+                    { text: "A marca do produto.", correct: false, rationale: "Incorreto. A marca identifica a origem comercial." },
+                    { text: "A aparência ornamental e estética de um objeto.", correct: true, rationale: "Correto! O Desenho Industrial protege a forma plástica, o design que torna o produto visualmente único." },
+                    { text: "O processo de fabricação do produto.", correct: false, rationale: "Incorreto. Processos de fabricação podem ser protegidos por patente." }
+                ],
+                difficulty: 1
+            },
+             {
+                question: "Segundo o Manual de Oslo, uma inovação deve ser, no mínimo:",
+                options: [
+                    { text: "Nova para o mercado mundial.", correct: false, rationale: "Incorreto. Ser nova para o mundo é o mais alto grau de novidade, mas não o requisito mínimo." },
+                    { text: "Aprovada por um órgão governamental.", correct: false, rationale: "Incorreto. A inovação é um conceito de negócio e não depende de aprovação formal, como uma patente." },
+                    { text: "Nova ou significativamente melhorada para a empresa.", correct: true, rationale: "Correto! A inovação é relativa à empresa. Se uma empresa adota um processo que é novo para ela, é uma inovação, mesmo que outras já o usem." },
+                    { text: "Capaz de dobrar os lucros.", correct: false, rationale: "Incorreto. O sucesso financeiro é um objetivo, mas não um critério para definir uma inovação." }
+                ],
+                difficulty: 1
+            },
+            // Dificuldade 2: Detalhes e Prazos
+            {
+                question: "No Brasil, qual o prazo de validade de uma patente de invenção e de um modelo de utilidade, respectivamente?",
+                options: [
+                    { text: "10 anos e 15 anos.", correct: false, rationale: "Incorreto. 10 anos é o prazo de registro de marca." },
+                    { text: "20 anos e 15 anos.", correct: true, rationale: "Correto! A patente de invenção tem validade de 20 anos e a de modelo de utilidade, 15 anos, a contar da data do depósito." },
+                    { text: "20 anos e 25 anos.", correct: false, rationale: "Incorreto. 25 anos é o prazo máximo de proteção para um desenho industrial (10 anos + 3 prorrogações de 5)." },
+                    { text: "Vitalícia para ambos.", correct: false, rationale: "Incorreto. Os direitos de propriedade industrial são temporários para promover o avanço tecnológico." }
+                ],
+                difficulty: 2
+            },
+            {
+                question: "Qual a diferença entre uma marca nominativa, figurativa e mista?",
+                options: [
+                    { text: "Nominativa é só para produtos, figurativa para serviços e mista para ambos.", correct: false, rationale: "Incorreto. A classificação se refere à forma de apresentação da marca, não ao tipo de produto ou serviço." },
+                    { text: "Nominativa é só texto, figurativa é só imagem, e mista é a combinação de texto e imagem.", correct: true, rationale: "Correto! Essa é a distinção exata: nominativa (palavra), figurativa (desenho/símbolo) e mista (junção dos dois)." },
+                    { text: "Nominativa é registrada no Brasil, figurativa no exterior e mista em ambos.", correct: false, rationale: "Incorreto. Todas podem ser registradas nacional e internacionalmente. A classificação não tem a ver com o território." },
+                    { text: "Nominativa é barata, figurativa é cara e mista tem preço intermediário.", correct: false, rationale: "Incorreto. O custo do registro não depende dessa classificação." }
+                ],
+                difficulty: 2
+            },
+            {
+                question: "Os Direitos Conexos protegem quem?",
+                options: [
+                    { text: "Apenas os autores de obras originais.", correct: false, rationale: "Incorreto. Os autores são protegidos pelo Direito de Autor. Os Direitos Conexos são para outros envolvidos na divulgação da obra." },
+                    { text: "Artistas intérpretes/executantes, produtores fonográficos e empresas de radiodifusão.", correct: true, rationale: "Correto! Os Direitos Conexos protegem aqueles que 'conectam' a obra ao público, como o cantor que interpreta uma música ou a rádio que a transmite." },
+                    { text: "Inventores de tecnologias relacionadas à arte.", correct: false, rationale: "Incorreto. Inventores são protegidos por patentes." },
+                    { text: "Consumidores de obras culturais.", correct: false, rationale: "Incorreto. A proteção é para os criadores e divulgadores, não para os consumidores." }
+                ],
+                difficulty: 2
+            },
+             {
+                question: "O que é o 'período de graça' no contexto de patentes no Brasil?",
+                options: [
+                    { text: "Um período de 1 ano após a concessão da patente em que não é preciso pagar anuidades.", correct: false, rationale: "Incorreto. O período de graça está relacionado à divulgação da invenção antes do depósito do pedido." },
+                    { text: "O prazo que o INPI tem para analisar um pedido de patente.", correct: false, rationale: "Incorreto. Este é o prazo de exame, não o período de graça." },
+                    { text: "Um prazo de 180 dias antes do depósito em que o inventor pode divulgar sua invenção sem que isso prejudique o requisito de novidade.", correct: true, rationale: "Correto! É uma salvaguarda que permite ao inventor divulgar sua criação (em feiras, artigos, etc.) por um tempo limitado antes de depositar o pedido de patente." },
+                    { text: "O tempo que uma patente leva para cair em domínio público.", correct: false, rationale: "Incorreto. O tempo para cair em domínio público é o prazo de vigência da patente (20 anos para invenção)." }
+                ],
+                difficulty: 2
+            },
+             {
+                question: "Segundo o Manual de Oslo, o que é uma 'inovação de marketing'?",
+                options: [
+                    { text: "Qualquer campanha publicitária para um produto.", correct: false, rationale: "Incorreto. Uma campanha pode usar métodos já existentes. A inovação requer a implementação de um método de marketing novo para a empresa." },
+                    { text: "A implementação de um novo método de marketing, com mudanças significativas no design, embalagem, posicionamento, promoção ou preço.", correct: true, rationale: "Correto! Envolve uma mudança estratégica na forma como o produto é apresentado, posicionado ou precificado, que seja nova para a empresa." },
+                    { text: "A criação de um novo departamento de marketing na empresa.", correct: false, rationale: "Incorreto. Isso seria uma inovação organizacional, pois muda a estrutura da empresa." },
+                    { text: "A contratação de uma agência de publicidade famosa.", correct: false, rationale: "Incorreto. A contratação de um fornecedor não é, por si só, uma inovação de marketing." }
+                ],
+                difficulty: 2
+            },
+            // Dificuldade 3: Aspectos Específicos e Legais
+            {
+                question: "A proteção de um programa de computador (software) no Brasil se dá principalmente por qual regime?",
+                options: [
+                    { text: "Patente de Invenção, pois é uma ferramenta técnica.", correct: false, rationale: "Incorreto. No Brasil, o software 'em si' não é patenteável. A proteção principal é outra." },
+                    { text: "Direito Autoral, sendo considerado uma obra literária.", correct: true, rationale: "Correto! A Lei de Software estabelece que programas de computador recebem a proteção do Direito Autoral, como se fossem uma obra literária (o código-fonte)." },
+                    { text: "Segredo Industrial, sendo a única forma de proteção possível.", correct: false, rationale: "Incorreto. Segredo industrial é uma opção (manter o código-fonte secreto), mas não é a proteção legal principal e formal." },
+                    { text: "Desenho Industrial, protegendo a interface gráfica.", correct: false, rationale: "Incorreto. Embora a interface possa ter elementos de design, a proteção principal do código é via Direito Autoral." }
+                ],
+                difficulty: 3
+            },
+            {
+                question: "Uma empresa desenvolveu uma nova garrafa com formato único para seu suco. Que tipo(s) de proteção de PI seria(m) mais adequado(s)?",
+                options: [
+                    { text: "Apenas Patente de Invenção.", correct: false, rationale: "Incorreto. A patente protegeria uma funcionalidade nova da garrafa (ex: um novo sistema de vedação), mas não sua forma estética." },
+                    { text: "Desenho Industrial para a forma e Marca Tridimensional para a embalagem como sinal distintivo.", correct: true, rationale: "Correto! O Desenho Industrial protege a forma ornamental. Com o tempo, se essa forma se tornar um identificador da marca (como a garrafa da Coca-Cola), pode ser registrada também como Marca Tridimensional." },
+                    { text: "Apenas Direito Autoral, por ser uma criação artística.", correct: false, rationale: "Incorreto. O Direito Autoral poderia proteger um desenho artístico aplicado à garrafa, mas não a forma da garrafa em si, que é um produto industrial." },
+                    { text: "Apenas Indicação Geográfica.", correct: false, rationale: "Incorreto. A Indicação Geográfica se aplicaria se o suco viesse de uma região específica famosa por isso, não à forma da garrafa." }
+                ],
+                difficulty: 3
+            },
+            {
+                question: "O que é o Tratado de Cooperação em Matéria de Patentes (PCT)?",
+                options: [
+                    { text: "Um tratado que concede uma 'patente mundial' válida em todos os países.", correct: false, rationale: "Incorreto. Não existe uma 'patente mundial'. O PCT é um sistema que facilita o processo de depósito, mas a concessão da patente ainda é decidida por cada país." },
+                    { text: "Um sistema que facilita o depósito de pedidos de patente em múltiplos países simultaneamente através de um único pedido internacional.", correct: true, rationale: "Correto! O PCT unifica a fase inicial do processo de depósito, economizando tempo e dinheiro antes de entrar nas fases nacionais em cada país desejado." },
+                    { text: "Um acordo para padronizar os custos de patentes no mundo todo.", correct: false, rationale: "Incorreto. Os custos variam significativamente entre os países. O PCT ajuda a adiar e otimizar alguns desses custos, mas não os padroniza." },
+                    { text: "Uma corte internacional para julgar disputas de patentes.", correct: false, rationale: "Incorreto. Disputas de patentes são geralmente julgadas nos tribunais do país onde a patente foi concedida e supostamente infringida." }
+                ],
+                difficulty: 3
+            },
+            {
+                question: "Uma 'inovação de processo', segundo o Manual de Oslo, pode incluir:",
+                options: [
+                    { text: "Apenas a automação completa de uma linha de produção.", correct: false, rationale: "Incorreto. A automação é um exemplo, mas a inovação de processo é mais ampla e inclui outras melhorias." },
+                    { text: "A introdução de um sistema de rastreamento de bens por código de barras ou a implementação de um novo software de contabilidade.", correct: true, rationale: "Correto! Inovações de processo incluem melhorias significativas nos métodos de produção ou distribuição, e também em atividades de suporte como logística e contabilidade." },
+                    { text: "A mudança de cor de um produto para atrair um novo público.", correct: false, rationale: "Incorreto. Isso seria uma inovação de marketing, pois altera a percepção e o apelo do produto." },
+                    { text: "A decisão de terceirizar o serviço de limpeza da empresa.", correct: false, rationale: "Incorreto. Se for a primeira vez que a empresa adota o outsourcing como método organizacional, isso seria uma inovação organizacional." }
+                ],
+                difficulty: 3
+            },
+            {
+                question: "Qual é a principal consequência legal de uma marca se tornar 'genérica'?",
+                options: [
+                    { text: "Ela passa a ser considerada de 'alto renome' e ganha proteção extra.", correct: false, rationale: "Incorreto. Ocorre o oposto, a marca perde sua força e proteção." },
+                    { text: "A empresa é multada por publicidade excessiva.", correct: false, rationale: "Incorreto. Não há multa, mas a perda de um ativo valioso." },
+                    { text: "O registro pode ser cancelado e a marca perde sua proteção legal, caindo em domínio público.", correct: true, rationale: "Correto! Se uma marca passa a ser usada como o nome comum do produto (ex: gilete, isopor), ela perde sua função distintiva e, consequentemente, sua proteção legal." },
+                    { text: "O prazo de validade do registro é reduzido para 5 anos.", correct: false, rationale: "Incorreto. A consequência é a perda total da proteção, não a redução do prazo." }
+                ],
+                difficulty: 3
+            }
+        ];
+
+        // Elementos da UI
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const confirmButton = document.getElementById('confirm-button');
+        const questionText = document.getElementById('question-text');
+        const answerOptionsContainer = document.getElementById('answer-options');
+        const feedbackSection = document.getElementById('feedback-section');
+        const progressBar = document.getElementById('progress-bar');
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const fullscreenIcon = document.getElementById('fullscreen-icon');
+        const exitFullscreenIcon = document.getElementById('exit-fullscreen-icon');
+        const fullscreenErrorMsg = document.getElementById('fullscreen-error-msg');
+
+        // Estado do Jogo
+        let currentLevel = 1;
+        let score = 0;
+        let correctStreak = 0;
+        let questionsAnswered = 0;
+        const totalQuestionsToAsk = 10;
+        let availableQuestions = [];
+        let currentQuestion = {};
+        let selectedAnswer = null;
+        let answered = false;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function loadAvailableQuestions() {
+            availableQuestions = questionBank.filter(q => q.difficulty === currentLevel);
+            if (availableQuestions.length === 0 && currentLevel < 3) {
+                currentLevel++;
+                levelDisplay.textContent = currentLevel;
+                loadAvailableQuestions();
+                return;
+            } else if (availableQuestions.length === 0) {
+                endGame();
+                return;
+            }
+            shuffleArray(availableQuestions);
+        }
+        
+        function startGame() {
+            score = 0;
+            currentLevel = 1;
+            correctStreak = 0;
+            questionsAnswered = 0;
+            scoreDisplay.textContent = score;
+            levelDisplay.textContent = currentLevel;
+            startScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadAvailableQuestions();
+            displayNextQuestion();
+        }
+
+        function displayNextQuestion() {
+            if (questionsAnswered >= totalQuestionsToAsk) {
+                endGame();
+                return;
+            }
+            if (availableQuestions.length === 0) {
+                loadAvailableQuestions();
+                if (availableQuestions.length === 0) {
+                    endGame();
+                    return;
+                }
+            }
+            resetState();
+            currentQuestion = availableQuestions.pop();
+            questionText.textContent = currentQuestion.question;
+            answerOptionsContainer.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerHTML = `<span class="font-bold mr-2 border border-gray-300 rounded-md px-2">${String.fromCharCode(65 + index)}</span> ${option.text}`;
+                button.className = 'w-full text-left p-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-semibold text-lg duo-button bg-white hover:bg-gray-100';
+                button.dataset.index = index;
+                button.onclick = () => selectAnswer(button, index);
+                answerOptionsContainer.appendChild(button);
+            });
+            questionsAnswered++;
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = (questionsAnswered / totalQuestionsToAsk) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        function resetState() {
+            answered = false;
+            selectedAnswer = null;
+            feedbackSection.innerHTML = '';
+            confirmButton.textContent = 'Verificar';
+            confirmButton.disabled = true;
+            confirmButton.className = 'w-full mt-6 bg-gray-300 text-gray-500 font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg cursor-not-allowed';
+            answerOptionsContainer.querySelectorAll('button').forEach(btn => {
+                btn.className = 'w-full text-left p-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-semibold text-lg duo-button bg-white hover:bg-gray-100';
+                btn.disabled = false;
+            });
+        }
+        
+        function selectAnswer(button, index) {
+            if (answered) return;
+            answerOptionsContainer.querySelectorAll('button').forEach(btn => {
+                 btn.classList.remove('selected', 'bg-blue-50');
+                 btn.style.borderColor = '';
+            });
+            button.classList.add('selected', 'bg-blue-50');
+            button.style.borderColor = '#3B82F6';
+            selectedAnswer = index;
+            confirmButton.disabled = false;
+            confirmButton.className = 'w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg transform hover:scale-105 transition-transform';
+        }
+
+        function checkAnswer() {
+            if (answered) {
+                displayNextQuestion();
+                return;
+            }
+            answered = true;
+            const selectedOption = currentQuestion.options[selectedAnswer];
+            const isCorrect = selectedOption.correct;
+            const buttons = answerOptionsContainer.querySelectorAll('button');
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (currentQuestion.options[index].correct) {
+                    btn.classList.add('correct');
+                } else if (index === selectedAnswer) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            let feedbackHTML = '';
+            if (isCorrect) {
+                score += 10 * currentLevel;
+                correctStreak++;
+                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-correct bg-green-50"><h3 class="text-xl font-bold mb-2">Correto!</h3><p class="text-gray-700">${selectedOption.rationale}</p></div>`;
+                if (correctStreak >= 2 && currentLevel < 3) {
+                    currentLevel++;
+                    correctStreak = 0;
+                    levelDisplay.textContent = currentLevel;
+                }
+            } else {
+                correctStreak = 0;
+                const correctOption = currentQuestion.options.find(opt => opt.correct);
+                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-incorrect bg-red-50"><h3 class="text-xl font-bold mb-2">Ops, não foi desta vez!</h3><p class="text-gray-700 mb-2"><b>Sua resposta:</b> ${selectedOption.rationale}</p><p class="text-gray-700"><b>Resposta correta:</b> ${correctOption.rationale}</p></div>`;
+            }
+            feedbackSection.innerHTML = feedbackHTML;
+            scoreDisplay.textContent = score;
+            confirmButton.textContent = 'Próxima Pergunta';
+        }
+        
+        function endGame() {
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreDisplay.textContent = score;
+        }
+
+        // Lógica da Tela Cheia
+        function showFullscreenError() {
+            fullscreenErrorMsg.classList.remove('hidden');
+            setTimeout(() => {
+                fullscreenErrorMsg.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                fullscreenErrorMsg.style.opacity = '0';
+                setTimeout(() => {
+                    fullscreenErrorMsg.classList.add('hidden');
+                }, 500);
+            }, 5000);
+        }
+
+        function toggleFullScreen() {
+            const elem = document.documentElement;
+            // Verifica se a API é suportada e permitida
+            if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
+                 showFullscreenError();
+                 return;
+            }
+            
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                const requestPromise = elem.requestFullscreen ? elem.requestFullscreen() : elem.webkitRequestFullscreen();
+                if (requestPromise) {
+                    requestPromise.catch(err => {
+                        console.error(`Erro ao tentar entrar em tela cheia: ${err.name} (${err.message})`);
+                        showFullscreenError();
+                    });
+                }
+            } else {
+                const exitPromise = document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen();
+                if (exitPromise) {
+                    exitPromise.catch(err => {
+                         console.error(`Erro ao sair da tela cheia: ${err.name} (${err.message})`);
+                    });
+                }
+            }
+        }
+
+        function updateFullscreenIcons() {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                fullscreenIcon.classList.add('hidden');
+                exitFullscreenIcon.classList.remove('hidden');
+            } else {
+                fullscreenIcon.classList.remove('hidden');
+                exitFullscreenIcon.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        confirmButton.addEventListener('click', checkAnswer);
+        fullscreenBtn.addEventListener('click', toggleFullScreen);
+        document.addEventListener('fullscreenchange', updateFullscreenIcons);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenIcons);
+
+    </script>
 </body>
 </html>
+
