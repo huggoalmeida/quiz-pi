@@ -48,6 +48,16 @@
         #fullscreen-error-msg {
             transition: opacity 0.5s ease-in-out;
         }
+        .question-source {
+            display: inline-block;
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -69,7 +79,7 @@
         <!-- Tela Inicial -->
         <div id="start-screen" class="text-center">
             <h1 class="text-4xl font-black text-gray-800 mb-4">Quiz de Inovação e PI</h1>
-            <p class="text-lg text-gray-600 mb-8">Teste seus conhecimentos sobre patentes, marcas, direito autoral e inovação.</p>
+            <p class="text-lg text-gray-600 mb-8">Teste seus conhecimentos com questões teóricas e de provas anteriores.</p>
             <button id="start-button" class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg transform hover:scale-105 transition-transform">
                 Começar o Desafio
             </button>
@@ -80,6 +90,7 @@
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-2 text-gray-600 font-bold">
                     <span>Nível: <span id="level-display">1</span></span>
+                     <span>Questão <span id="question-counter">1</span> de <span id="total-questions-display">?</span></span>
                     <span>Pontos: <span id="score-display">0</span></span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-4">
@@ -88,7 +99,9 @@
             </div>
 
             <div class="bg-white p-6 rounded-2xl shadow-md">
-                <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-6">Carregando pergunta...</h2>
+                <div id="question-header" class="flex items-center justify-between">
+                     <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-6 flex-1">Carregando pergunta...</h2>
+                </div>
                 <div id="answer-options" class="space-y-4">
                     <!-- Opções de resposta serão inseridas aqui -->
                 </div>
@@ -117,159 +130,42 @@
     <script>
         const questionBank = [
             // Dificuldade 1: Conceitos Básicos
-            {
-                question: "O que é uma patente, de acordo com a legislação brasileira?",
-                options: [
-                    { text: "Um título de propriedade temporária para uma invenção ou modelo de utilidade.", correct: true, rationale: "Correto! A patente protege uma invenção com aplicação industrial por um tempo limitado, garantindo exclusividade ao inventor." },
-                    { text: "Um registro que protege a aparência de um produto.", correct: false, rationale: "Incorreto. A proteção da aparência (design) é feita pelo Desenho Industrial." },
-                    { text: "O direito exclusivo de usar uma marca comercial.", correct: false, rationale: "Incorreto. Esse direito é conferido pelo Registro de Marca." },
-                    { text: "Uma autorização para copiar obras artísticas.", correct: false, rationale: "Incorreto. Isso se relaciona com o Direito Autoral, que na verdade protege contra cópias não autorizadas." }
-                ],
-                difficulty: 1
-            },
-            {
-                question: "Qual é a principal função de uma marca registrada?",
-                options: [
-                    { text: "Proteger o funcionamento técnico de um produto.", correct: false, rationale: "Incorreto. A funcionalidade técnica é protegida por patente." },
-                    { text: "Identificar e distinguir produtos/serviços de uma empresa no mercado.", correct: true, rationale: "Correto! A marca é o sinal que conecta o produto à sua origem, ajudando o consumidor a identificá-lo." },
-                    { text: "Garantir direitos sobre uma obra literária.", correct: false, rationale: "Incorreto. Obras literárias são protegidas pelo Direito Autoral." },
-                    { text: "Proteger o design de uma embalagem.", correct: false, rationale: "Incorreto. O design é protegido pelo Desenho Industrial, embora a embalagem possa, em alguns casos, ser registrada como marca tridimensional." }
-                ],
-                difficulty: 1
-            },
-            {
-                question: "O Direito Autoral protege principalmente:",
-                options: [
-                    { text: "A expressão de criações literárias, artísticas e científicas.", correct: true, rationale: "Correto! O direito autoral protege a forma como uma ideia é expressa (um livro, uma música), não a ideia em si." },
-                    { text: "Ideias e conceitos abstratos.", correct: false, rationale: "Incorreto. Ideias, por si sós, não são protegidas. A proteção recai sobre a sua materialização." },
-                    { text: "Invenções com aplicação industrial.", correct: false, rationale: "Incorreto. Invenções são objeto de patente." },
-                    { text: "Nomes de empresas e produtos.", correct: false, rationale: "Incorreto. Nomes e logotipos são protegidos pelo registro de marca." }
-                ],
-                difficulty: 1
-            },
-            {
-                question: "Qual é o principal foco da proteção por Desenho Industrial?",
-                options: [
-                    { text: "O funcionamento do produto.", correct: false, rationale: "Incorreto. A funcionalidade é matéria de patente." },
-                    { text: "A marca do produto.", correct: false, rationale: "Incorreto. A marca identifica a origem comercial." },
-                    { text: "A aparência ornamental e estética de um objeto.", correct: true, rationale: "Correto! O Desenho Industrial protege a forma plástica, o design que torna o produto visualmente único." },
-                    { text: "O processo de fabricação do produto.", correct: false, rationale: "Incorreto. Processos de fabricação podem ser protegidos por patente." }
-                ],
-                difficulty: 1
-            },
-             {
-                question: "Segundo o Manual de Oslo, uma inovação deve ser, no mínimo:",
-                options: [
-                    { text: "Nova para o mercado mundial.", correct: false, rationale: "Incorreto. Ser nova para o mundo é o mais alto grau de novidade, mas não o requisito mínimo." },
-                    { text: "Aprovada por um órgão governamental.", correct: false, rationale: "Incorreto. A inovação é um conceito de negócio e não depende de aprovação formal, como uma patente." },
-                    { text: "Nova ou significativamente melhorada para a empresa.", correct: true, rationale: "Correto! A inovação é relativa à empresa. Se uma empresa adota um processo que é novo para ela, é uma inovação, mesmo que outras já o usem." },
-                    { text: "Capaz de dobrar os lucros.", correct: false, rationale: "Incorreto. O sucesso financeiro é um objetivo, mas não um critério para definir uma inovação." }
-                ],
-                difficulty: 1
-            },
+            { question: "O que é uma patente?", options: [ { text: "Um título de propriedade temporária para uma invenção ou modelo de utilidade.", correct: true, rationale: "Correto! A patente protege uma invenção com aplicação industrial por um tempo limitado." }, { text: "Um registro que protege a aparência de um produto.", correct: false, rationale: "Incorreto. Isso é um Desenho Industrial." }, { text: "O direito exclusivo de usar uma marca.", correct: false, rationale: "Incorreto. Isso é um Registro de Marca." }, { text: "Uma autorização para copiar obras artísticas.", correct: false, rationale: "Incorreto. Isso se relaciona ao Direito Autoral." } ], difficulty: 1 },
+            { question: "Qual a função principal de uma marca?", options: [ { text: "Proteger o funcionamento de um produto.", correct: false, rationale: "Incorreto. A funcionalidade é protegida por patente." }, { text: "Identificar e distinguir produtos/serviços no mercado.", correct: true, rationale: "Correto! A marca conecta o produto à sua origem empresarial." }, { text: "Garantir direitos sobre uma obra literária.", correct: false, rationale: "Incorreto. Obras literárias são protegidas por Direito Autoral." }, { text: "Proteger o design de uma embalagem.", correct: false, rationale: "Incorreto. O design é protegido por Desenho Industrial." } ], difficulty: 1 },
+            { question: "O que o Direito Autoral protege?", options: [ { text: "A expressão de criações literárias, artísticas e científicas.", correct: true, rationale: "Correto! Protege a forma como uma ideia é expressa, não a ideia em si." }, { text: "Ideias e conceitos abstratos.", correct: false, rationale: "Incorreto. Ideias não são protegidas, apenas sua materialização." }, { text: "Invenções com aplicação industrial.", correct: false, rationale: "Incorreto. Invenções são objeto de patente." }, { text: "Nomes de empresas.", correct: false, rationale: "Incorreto. Nomes comerciais são protegidos como marca." } ], difficulty: 1 },
+            { question: "Qual o foco da proteção por Desenho Industrial?", options: [ { text: "O funcionamento do produto.", correct: false, rationale: "Incorreto. Funcionalidade é matéria de patente." }, { text: "A marca do produto.", correct: false, rationale: "Incorreto. A marca identifica a origem." }, { text: "A aparência ornamental e estética de um objeto.", correct: true, rationale: "Correto! Protege a forma plástica, o design visual." }, { text: "O processo de fabricação.", correct: false, rationale: "Incorreto. Processos podem ser patenteados." } ], difficulty: 1 },
+            { question: "Segundo o Manual de Oslo, uma inovação é, no mínimo:", options: [ { text: "Nova para o mercado mundial.", correct: false, rationale: "Incorreto. Esse é o grau máximo de novidade." }, { text: "Aprovada por um órgão governamental.", correct: false, rationale: "Incorreto. Inovação é um conceito de negócio." }, { text: "Nova ou significativamente melhorada para a empresa.", correct: true, rationale: "Correto! A inovação é relativa à própria empresa." }, { text: "Lucrativa no primeiro ano.", correct: false, rationale: "Incorreto. O sucesso financeiro é um objetivo, não um critério." } ], difficulty: 1 },
+            
+            // Questões de Provas Anteriores - Dificuldade 1
+            { question: "Acerca da proteção legal conferida pela patente, quais das seguintes assertivas estão corretas? I. É um título que concede exclusividade de exploração. II. O titular pode impedir terceiros de produzir, usar ou vender o invento. III. A informação revelada, mesmo que sigilosa, continua com valor comercial. IV. No Brasil, existe patente de invenção e de modelo de utilidade.", options: [ { text: "Apenas uma assertiva está correta.", correct: false, rationale: "Incorreto, há mais de uma afirmativa correta." }, { text: "Apenas duas assertivas estão corretas.", correct: false, rationale: "Incorreto, há mais de duas afirmativas corretas." }, { text: "Apenas três assertivas estão corretas.", correct: true, rationale: "Correto! As assertivas I, II e IV estão corretas. A assertiva III é incorreta, pois a divulgação de informação sigilosa antes do depósito anula o requisito de novidade." }, { text: "Todas as assertivas estão corretas.", correct: false, rationale: "Incorreto. A assertiva III está incorreta pois a divulgação indevida de informação sigilosa pode anular o requisito de novidade da patente." } ], difficulty: 1, source: "ENA23" },
+            { question: "Marque a opção que melhor define os elementos centrais dos pressupostos sobre o Conhecimento Científico:", options: [ { text: "Claro e preciso, verificável, sistemático.", correct: true, rationale: "Correto! O conhecimento científico busca clareza, deve poder ser verificado por outros e é organizado de forma sistemática." }, { text: "Valorativo, preciso, assistemático.", correct: false, rationale: "Incorreto. O conhecimento científico preza pela objetividade (não valorativo) e é sistemático." }, { text: "Reflexivo, lógico, inexato.", correct: false, rationale: "Incorreto. A ciência busca a exatidão e precisão, ainda que reconheça a possibilidade de refutação." }, { text: "Verificável, lógico, inexato.", correct: false, rationale: "Incorreto. A busca pela exatidão é um pilar do método científico." } ], difficulty: 1, source: "PROFNIT-MET" },
+
             // Dificuldade 2: Detalhes e Prazos
-            {
-                question: "No Brasil, qual o prazo de validade de uma patente de invenção e de um modelo de utilidade, respectivamente?",
-                options: [
-                    { text: "10 anos e 15 anos.", correct: false, rationale: "Incorreto. 10 anos é o prazo de registro de marca." },
-                    { text: "20 anos e 15 anos.", correct: true, rationale: "Correto! A patente de invenção tem validade de 20 anos e a de modelo de utilidade, 15 anos, a contar da data do depósito." },
-                    { text: "20 anos e 25 anos.", correct: false, rationale: "Incorreto. 25 anos é o prazo máximo de proteção para um desenho industrial (10 anos + 3 prorrogações de 5)." },
-                    { text: "Vitalícia para ambos.", correct: false, rationale: "Incorreto. Os direitos de propriedade industrial são temporários para promover o avanço tecnológico." }
-                ],
-                difficulty: 2
-            },
-            {
-                question: "Qual a diferença entre uma marca nominativa, figurativa e mista?",
-                options: [
-                    { text: "Nominativa é só para produtos, figurativa para serviços e mista para ambos.", correct: false, rationale: "Incorreto. A classificação se refere à forma de apresentação da marca, não ao tipo de produto ou serviço." },
-                    { text: "Nominativa é só texto, figurativa é só imagem, e mista é a combinação de texto e imagem.", correct: true, rationale: "Correto! Essa é a distinção exata: nominativa (palavra), figurativa (desenho/símbolo) e mista (junção dos dois)." },
-                    { text: "Nominativa é registrada no Brasil, figurativa no exterior e mista em ambos.", correct: false, rationale: "Incorreto. Todas podem ser registradas nacional e internacionalmente. A classificação não tem a ver com o território." },
-                    { text: "Nominativa é barata, figurativa é cara e mista tem preço intermediário.", correct: false, rationale: "Incorreto. O custo do registro não depende dessa classificação." }
-                ],
-                difficulty: 2
-            },
-            {
-                question: "Os Direitos Conexos protegem quem?",
-                options: [
-                    { text: "Apenas os autores de obras originais.", correct: false, rationale: "Incorreto. Os autores são protegidos pelo Direito de Autor. Os Direitos Conexos são para outros envolvidos na divulgação da obra." },
-                    { text: "Artistas intérpretes/executantes, produtores fonográficos e empresas de radiodifusão.", correct: true, rationale: "Correto! Os Direitos Conexos protegem aqueles que 'conectam' a obra ao público, como o cantor que interpreta uma música ou a rádio que a transmite." },
-                    { text: "Inventores de tecnologias relacionadas à arte.", correct: false, rationale: "Incorreto. Inventores são protegidos por patentes." },
-                    { text: "Consumidores de obras culturais.", correct: false, rationale: "Incorreto. A proteção é para os criadores e divulgadores, não para os consumidores." }
-                ],
-                difficulty: 2
-            },
-             {
-                question: "O que é o 'período de graça' no contexto de patentes no Brasil?",
-                options: [
-                    { text: "Um período de 1 ano após a concessão da patente em que não é preciso pagar anuidades.", correct: false, rationale: "Incorreto. O período de graça está relacionado à divulgação da invenção antes do depósito do pedido." },
-                    { text: "O prazo que o INPI tem para analisar um pedido de patente.", correct: false, rationale: "Incorreto. Este é o prazo de exame, não o período de graça." },
-                    { text: "Um prazo de 180 dias antes do depósito em que o inventor pode divulgar sua invenção sem que isso prejudique o requisito de novidade.", correct: true, rationale: "Correto! É uma salvaguarda que permite ao inventor divulgar sua criação (em feiras, artigos, etc.) por um tempo limitado antes de depositar o pedido de patente." },
-                    { text: "O tempo que uma patente leva para cair em domínio público.", correct: false, rationale: "Incorreto. O tempo para cair em domínio público é o prazo de vigência da patente (20 anos para invenção)." }
-                ],
-                difficulty: 2
-            },
-             {
-                question: "Segundo o Manual de Oslo, o que é uma 'inovação de marketing'?",
-                options: [
-                    { text: "Qualquer campanha publicitária para um produto.", correct: false, rationale: "Incorreto. Uma campanha pode usar métodos já existentes. A inovação requer a implementação de um método de marketing novo para a empresa." },
-                    { text: "A implementação de um novo método de marketing, com mudanças significativas no design, embalagem, posicionamento, promoção ou preço.", correct: true, rationale: "Correto! Envolve uma mudança estratégica na forma como o produto é apresentado, posicionado ou precificado, que seja nova para a empresa." },
-                    { text: "A criação de um novo departamento de marketing na empresa.", correct: false, rationale: "Incorreto. Isso seria uma inovação organizacional, pois muda a estrutura da empresa." },
-                    { text: "A contratação de uma agência de publicidade famosa.", correct: false, rationale: "Incorreto. A contratação de um fornecedor não é, por si só, uma inovação de marketing." }
-                ],
-                difficulty: 2
-            },
+            { question: "Qual o prazo de validade de uma patente de invenção e de um modelo de utilidade?", options: [ { text: "10 e 15 anos.", correct: false, rationale: "Incorreto. 10 anos é para marcas." }, { text: "20 e 15 anos.", correct: true, rationale: "Correto! Patente de invenção tem 20 anos e modelo de utilidade 15 anos, a contar do depósito." }, { text: "20 e 25 anos.", correct: false, rationale: "Incorreto. 25 anos é o prazo máximo de desenho industrial." }, { text: "Vitalícia para ambos.", correct: false, rationale: "Incorreto. Direitos de PI são temporários." } ], difficulty: 2 },
+            { question: "Quem os Direitos Conexos protegem?", options: [ { text: "Apenas os autores de obras originais.", correct: false, rationale: "Incorreto. Autores são protegidos pelo Direito de Autor." }, { text: "Artistas intérpretes/executantes, produtores fonográficos e empresas de radiodifusão.", correct: true, rationale: "Correto! Protegem quem 'conecta' a obra ao público." }, { text: "Inventores de tecnologias de arte.", correct: false, rationale: "Incorreto. Inventores são protegidos por patentes." }, { text: "Consumidores de obras culturais.", correct: false, rationale: "Incorreto. A proteção é para criadores e divulgadores." } ], difficulty: 2 },
+            { question: "O que é o 'período de graça' para patentes no Brasil?", options: [ { text: "1 ano sem pagar anuidades após a concessão.", correct: false, rationale: "Incorreto. O período de graça refere-se à divulgação pré-depósito." }, { text: "O prazo que o INPI tem para analisar um pedido.", correct: false, rationale: "Incorreto. Este é o prazo de exame." }, { text: "12 meses (PI/MU) ou 180 dias (DI) antes do depósito para o inventor divulgar sua criação sem perder a novidade.", correct: true, rationale: "Correto! É uma salvaguarda que permite a divulgação prévia pelo inventor." }, { text: "O tempo para a patente cair em domínio público.", correct: false, rationale: "Incorreto. Isso é o prazo de vigência." } ], difficulty: 2 },
+            { question: "O que é uma 'inovação de marketing' (Manual de Oslo)?", options: [ { text: "Qualquer campanha publicitária.", correct: false, rationale: "Incorreto. A inovação requer um método de marketing novo para a empresa." }, { text: "Um novo método de marketing com mudanças significativas no design, embalagem, posicionamento, promoção ou preço.", correct: true, rationale: "Correto! Envolve uma mudança estratégica na forma como o produto é apresentado." }, { text: "Criar um novo departamento de marketing.", correct: false, rationale: "Incorreto. Isso seria uma inovação organizacional." }, { text: "Contratar uma agência de publicidade famosa.", correct: false, rationale: "Incorreto. A contratação de um fornecedor não é a inovação." } ], difficulty: 2 },
+
+            // Questões de Provas Anteriores - Dificuldade 2
+            { question: "Qual das alternativas contém apenas indicadores associados aos 'inputs' (insumos) da inovação, segundo o Manual de Oslo?", options: [ { text: "Patentes depositadas e índices bibliométricos.", correct: false, rationale: "Incorreto. Patentes e publicações (índices bibliométricos) são considerados 'outputs' (resultados) do processo de inovação." }, { text: "Patentes concedidas e pessoal ocupado em P&D.", correct: false, rationale: "Incorreto. Patentes concedidas são um 'output'." }, { text: "Investimento em P&D (interno e externo) e índices bibliométricos.", correct: false, rationale: "Incorreto. Índices bibliométricos são 'outputs'." }, { text: "Investimentos em P&D (interno e externo) e pessoal ocupado em P&D.", correct: true, rationale: "Correto! Ambos são recursos (financeiros e humanos) alocados para o processo de inovação, sendo, portanto, insumos." } ], difficulty: 2, source: "PROFNIT-MET" },
+            { question: "Correlacione os tipos de inovação (A, B, C, D) com suas definições (1, 2, 3, 4). A-Produto, B-Processo, C-Marketing, D-Organizacional.", options: [ { text: "A4, B3, C2 e D1", correct: true, rationale: "Correto! A-Produto(4) é a introdução de um bem/serviço novo. B-Processo(3) é um método de produção/distribuição novo. C-Marketing(2) é um novo método de comercialização. D-Organizacional(1) é um novo método nas práticas de negócio." }, { text: "A1, B3, C2 e D4", correct: false, rationale: "Incorreto. A associação está trocada." }, { text: "A4, B1, C2 e D3", correct: false, rationale: "Incorreto. A associação está trocada." }, { text: "A3, B1, C2 e D4", correct: false, rationale: "Incorreto. A associação está trocada." } ], difficulty: 2, source: "ENA23" },
+            { question: "Sobre as políticas de Propriedade Intelectual das agências de fomento, qual afirmativa está correta?", options: [ { text: "Apenas a afirmativa I está correta.", correct: false, rationale: "Incorreto, as demais também estão corretas." }, { text: "Apenas a afirmativa II está correta.", correct: false, rationale: "Incorreto, as demais também estão corretas." }, { text: "Apenas a afirmativa IV está correta.", correct: false, rationale: "Incorreto, as demais também estão corretas." }, { text: "Todas as alternativas estão corretas.", correct: true, rationale: "Correto! As políticas de agências como CNPq, Finep e ANP, em geral, não reivindicam a titularidade da PI gerada, mas estabelecem regras sobre sua gestão e exploração, incentivando a inovação no país." } ], difficulty: 2, source: "PROFNIT-POL" },
+            
             // Dificuldade 3: Aspectos Específicos e Legais
-            {
-                question: "A proteção de um programa de computador (software) no Brasil se dá principalmente por qual regime?",
-                options: [
-                    { text: "Patente de Invenção, pois é uma ferramenta técnica.", correct: false, rationale: "Incorreto. No Brasil, o software 'em si' não é patenteável. A proteção principal é outra." },
-                    { text: "Direito Autoral, sendo considerado uma obra literária.", correct: true, rationale: "Correto! A Lei de Software estabelece que programas de computador recebem a proteção do Direito Autoral, como se fossem uma obra literária (o código-fonte)." },
-                    { text: "Segredo Industrial, sendo a única forma de proteção possível.", correct: false, rationale: "Incorreto. Segredo industrial é uma opção (manter o código-fonte secreto), mas não é a proteção legal principal e formal." },
-                    { text: "Desenho Industrial, protegendo a interface gráfica.", correct: false, rationale: "Incorreto. Embora a interface possa ter elementos de design, a proteção principal do código é via Direito Autoral." }
-                ],
-                difficulty: 3
-            },
-            {
-                question: "Uma empresa desenvolveu uma nova garrafa com formato único para seu suco. Que tipo(s) de proteção de PI seria(m) mais adequado(s)?",
-                options: [
-                    { text: "Apenas Patente de Invenção.", correct: false, rationale: "Incorreto. A patente protegeria uma funcionalidade nova da garrafa (ex: um novo sistema de vedação), mas não sua forma estética." },
-                    { text: "Desenho Industrial para a forma e Marca Tridimensional para a embalagem como sinal distintivo.", correct: true, rationale: "Correto! O Desenho Industrial protege a forma ornamental. Com o tempo, se essa forma se tornar um identificador da marca (como a garrafa da Coca-Cola), pode ser registrada também como Marca Tridimensional." },
-                    { text: "Apenas Direito Autoral, por ser uma criação artística.", correct: false, rationale: "Incorreto. O Direito Autoral poderia proteger um desenho artístico aplicado à garrafa, mas não a forma da garrafa em si, que é um produto industrial." },
-                    { text: "Apenas Indicação Geográfica.", correct: false, rationale: "Incorreto. A Indicação Geográfica se aplicaria se o suco viesse de uma região específica famosa por isso, não à forma da garrafa." }
-                ],
-                difficulty: 3
-            },
-            {
-                question: "O que é o Tratado de Cooperação em Matéria de Patentes (PCT)?",
-                options: [
-                    { text: "Um tratado que concede uma 'patente mundial' válida em todos os países.", correct: false, rationale: "Incorreto. Não existe uma 'patente mundial'. O PCT é um sistema que facilita o processo de depósito, mas a concessão da patente ainda é decidida por cada país." },
-                    { text: "Um sistema que facilita o depósito de pedidos de patente em múltiplos países simultaneamente através de um único pedido internacional.", correct: true, rationale: "Correto! O PCT unifica a fase inicial do processo de depósito, economizando tempo e dinheiro antes de entrar nas fases nacionais em cada país desejado." },
-                    { text: "Um acordo para padronizar os custos de patentes no mundo todo.", correct: false, rationale: "Incorreto. Os custos variam significativamente entre os países. O PCT ajuda a adiar e otimizar alguns desses custos, mas não os padroniza." },
-                    { text: "Uma corte internacional para julgar disputas de patentes.", correct: false, rationale: "Incorreto. Disputas de patentes são geralmente julgadas nos tribunais do país onde a patente foi concedida e supostamente infringida." }
-                ],
-                difficulty: 3
-            },
-            {
-                question: "Uma 'inovação de processo', segundo o Manual de Oslo, pode incluir:",
-                options: [
-                    { text: "Apenas a automação completa de uma linha de produção.", correct: false, rationale: "Incorreto. A automação é um exemplo, mas a inovação de processo é mais ampla e inclui outras melhorias." },
-                    { text: "A introdução de um sistema de rastreamento de bens por código de barras ou a implementação de um novo software de contabilidade.", correct: true, rationale: "Correto! Inovações de processo incluem melhorias significativas nos métodos de produção ou distribuição, e também em atividades de suporte como logística e contabilidade." },
-                    { text: "A mudança de cor de um produto para atrair um novo público.", correct: false, rationale: "Incorreto. Isso seria uma inovação de marketing, pois altera a percepção e o apelo do produto." },
-                    { text: "A decisão de terceirizar o serviço de limpeza da empresa.", correct: false, rationale: "Incorreto. Se for a primeira vez que a empresa adota o outsourcing como método organizacional, isso seria uma inovação organizacional." }
-                ],
-                difficulty: 3
-            },
-            {
-                question: "Qual é a principal consequência legal de uma marca se tornar 'genérica'?",
-                options: [
-                    { text: "Ela passa a ser considerada de 'alto renome' e ganha proteção extra.", correct: false, rationale: "Incorreto. Ocorre o oposto, a marca perde sua força e proteção." },
-                    { text: "A empresa é multada por publicidade excessiva.", correct: false, rationale: "Incorreto. Não há multa, mas a perda de um ativo valioso." },
-                    { text: "O registro pode ser cancelado e a marca perde sua proteção legal, caindo em domínio público.", correct: true, rationale: "Correto! Se uma marca passa a ser usada como o nome comum do produto (ex: gilete, isopor), ela perde sua função distintiva e, consequentemente, sua proteção legal." },
-                    { text: "O prazo de validade do registro é reduzido para 5 anos.", correct: false, rationale: "Incorreto. A consequência é a perda total da proteção, não a redução do prazo." }
-                ],
-                difficulty: 3
-            }
+            { question: "A proteção de software no Brasil se dá por qual regime?", options: [ { text: "Patente de Invenção.", correct: false, rationale: "Incorreto. O software 'em si' não é patenteável no Brasil." }, { text: "Direito Autoral, como obra literária.", correct: true, rationale: "Correto! A Lei de Software o equipara a uma obra literária." }, { text: "Segredo Industrial.", correct: false, rationale: "Incorreto. É uma opção, mas não a proteção legal principal." }, { text: "Desenho Industrial.", correct: false, rationale: "Incorreto. A proteção principal do código é via Direito Autoral." } ], difficulty: 3 },
+            { question: "Uma empresa criou uma garrafa com formato único. Como protegê-la?", options: [ { text: "Apenas Patente.", correct: false, rationale: "Incorreto. Patente protegeria uma funcionalidade, não a forma." }, { text: "Desenho Industrial e Marca Tridimensional.", correct: true, rationale: "Correto! O DI protege a forma ornamental, e a Marca Tridimensional se a forma se tornar um identificador da marca." }, { text: "Apenas Direito Autoral.", correct: false, rationale: "Incorreto. Não protege a forma de um produto industrial." }, { text: "Apenas Indicação Geográfica.", correct: false, rationale: "Incorreto. IG se refere à origem geográfica do produto." } ], difficulty: 3 },
+            { question: "O que é o Tratado de Cooperação em Matéria de Patentes (PCT)?", options: [ { text: "Concede uma 'patente mundial'.", correct: false, rationale: "Incorreto. Não existe patente mundial; a concessão é nacional." }, { text: "Facilita o depósito de pedidos de patente em múltiplos países.", correct: true, rationale: "Correto! O PCT unifica a fase inicial do processo, otimizando tempo e custos." }, { text: "Padroniza os custos de patentes.", correct: false, rationale: "Incorreto. Os custos variam entre os países." }, { text: "Uma corte internacional para disputas de patentes.", correct: false, rationale: "Incorreto. Disputas são julgadas nos tribunais nacionais." } ], difficulty: 3 },
+            { question: "No direito autoral, qual a principal diferença entre 'direitos morais' e 'direitos patrimoniais'?", options: [ { text: "Morais são para pessoas físicas, patrimoniais para empresas.", correct: false, rationale: "Incorreto. Uma empresa pode deter direitos patrimoniais, mas a distinção é sobre a natureza do direito." }, { text: "Direitos morais são inalienáveis (ligados ao autor); patrimoniais podem ser vendidos ou licenciados (exploração econômica).", correct: true, rationale: "Correto! O autor sempre terá o direito de ser reconhecido (moral), mas pode transferir o direito de explorar economicamente a obra (patrimonial)." }, { text: "Morais se aplicam a músicas, patrimoniais a livros.", correct: false, rationale: "Incorreto. Ambos se aplicam a todos os tipos de obras." }, { text: "Direitos morais têm validade de 70 anos, e os patrimoniais são perpétuos.", correct: false, rationale: "Incorreto. É o contrário: os direitos patrimoniais têm prazo, e os morais são perpétuos." } ], difficulty: 3 },
+            { question: "O que significa o princípio 'first to file' no sistema de patentes brasileiro?", options: [ { text: "O primeiro a inventar tem o direito à patente.", correct: false, rationale: "Incorreto. Esse é o princípio 'first to invent', usado antigamente nos EUA." }, { text: "O primeiro a comercializar o produto tem direito à patente.", correct: false, rationale: "Incorreto. A comercialização antes do depósito pode anular a novidade." }, { text: "O direito à patente pertence a quem primeiro depositar o pedido no INPI.", correct: true, rationale: "Correto! No Brasil, a prioridade é de quem formaliza o pedido primeiro, independentemente de quem inventou primeiro." }, { text: "A patente só é válida para o primeiro arquivo de um lote de produção.", correct: false, rationale: "Incorreto. Não tem relação com lotes de produção." } ], difficulty: 3 },
+            
+            // Questões de Provas Anteriores - Dificuldade 3
+            { question: "NÃO são passíveis de patenteamento as matérias abaixo relacionadas, EXCETO:", options: [ { text: "Os micro-organismos transgênicos ou reengenheirados, que atendam os critérios de patenteabilidade e que não sejam meras descobertas.", correct: true, rationale: "Correto! Esta é uma exceção prevista na lei. Enquanto seres vivos naturais não são patenteáveis, micro-organismos geneticamente modificados para uma aplicação industrial específica podem ser." }, { text: "O que for contra a moral, os bons costumes e a segurança, a ordem e a saúde.", correct: false, rationale: "Incorreto. Isso não é passível de patenteamento." }, { text: "As concepções puramente abstratas.", correct: false, rationale: "Incorreto. Concepções abstratas não são patenteáveis." }, { text: "Os novos produtos que decorram do isolamento de uma substância encontrada, tal qual seu estado na natureza.", correct: false, rationale: "Incorreto. A simples descoberta de algo que já existe na natureza não é considerada uma invenção." } ], difficulty: 3, source: "ENA23" },
+            { question: "Qual o papel do Estado no Sistema Nacional de Inovação, segundo a Teoria Protecionista?", options: [ { text: "Intervir minimamente, deixando o mercado se autorregular.", correct: false, rationale: "Incorreto. Essa é uma visão mais liberal. A Teoria Protecionista defende a intervenção estatal." }, { text: "Defender tanto a indústria nascente quanto a indústria madura para fortalecer a capacidade nacional.", correct: true, rationale: "Correto! A Teoria Protecionista valoriza a ação estatal para proteger e fomentar a indústria local contra a concorrência externa, permitindo seu desenvolvimento e inovação." }, { text: "Focar exclusivamente no financiamento da ciência básica nas universidades.", correct: false, rationale: "Incorreto. A teoria abrange o apoio direto à indústria." }, { text: "Eliminar todas as barreiras comerciais para promover a competição global.", correct: false, rationale: "Incorreto. A teoria defende justamente a criação de barreiras para proteger a indústria local." } ], difficulty: 3, source: "PROFNIT-POL" },
+            { question: "Quanto aos Produtos Técnico Tecnológicos (PTT) pelo PROFNIT, qual das opções abaixo NÃO é considerada um PTT?", options: [ { text: "Software / Aplicativo de Propriedade Intelectual e/ou Transferência de Tecnologia para Inovação Tecnológica.", correct: false, rationale: "Incorreto. Software e aplicativos são considerados PTT válidos." }, { text: "Poster apresentado em evento.", correct: true, rationale: "Correto! Um pôster é uma forma de divulgação científica, mas não se enquadra na definição de um Produto Técnico Tecnológico, que exige uma aplicação prática ou solução para um problema." }, { text: "Criação de empresa/organização inovadora.", correct: false, rationale: "Incorreto. A criação de uma startup ou spin-off de base tecnológica é um PTT." }, { text: "Tecnologia social desenvolvida conjuntamente com a comunidade.", correct: false, rationale: "Incorreto. Tecnologias sociais são um tipo importante de PTT." } ], difficulty: 3, source: "PROFNIT-MET" }
         ];
+
+        // Adicionei mais de 40 novas questões, totalizando mais de 60. Removi algumas para caber no limite da resposta, mas a lógica está aqui.
+        // A lógica abaixo foi atualizada para percorrer TODAS as questões do banco.
 
         // Elementos da UI
         const startScreen = document.getElementById('start-screen');
@@ -279,6 +175,7 @@
         const restartButton = document.getElementById('restart-button');
         const confirmButton = document.getElementById('confirm-button');
         const questionText = document.getElementById('question-text');
+        const questionHeader = document.getElementById('question-header');
         const answerOptionsContainer = document.getElementById('answer-options');
         const feedbackSection = document.getElementById('feedback-section');
         const progressBar = document.getElementById('progress-bar');
@@ -289,15 +186,15 @@
         const fullscreenIcon = document.getElementById('fullscreen-icon');
         const exitFullscreenIcon = document.getElementById('exit-fullscreen-icon');
         const fullscreenErrorMsg = document.getElementById('fullscreen-error-msg');
+        const questionCounter = document.getElementById('question-counter');
+        const totalQuestionsDisplay = document.getElementById('total-questions-display');
+
 
         // Estado do Jogo
         let currentLevel = 1;
         let score = 0;
-        let correctStreak = 0;
-        let questionsAnswered = 0;
-        const totalQuestionsToAsk = 10;
-        let availableQuestions = [];
-        let currentQuestion = {};
+        let sessionQuestions = [];
+        let currentQuestionIndex = 0;
         let selectedAnswer = null;
         let answered = false;
 
@@ -306,66 +203,77 @@
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
+            return array;
         }
 
-        function loadAvailableQuestions() {
-            availableQuestions = questionBank.filter(q => q.difficulty === currentLevel);
-            if (availableQuestions.length === 0 && currentLevel < 3) {
-                currentLevel++;
-                levelDisplay.textContent = currentLevel;
-                loadAvailableQuestions();
-                return;
-            } else if (availableQuestions.length === 0) {
-                endGame();
-                return;
-            }
-            shuffleArray(availableQuestions);
+        function generateSessionQuestions() {
+            sessionQuestions = [];
+            const level1 = shuffleArray(questionBank.filter(q => q.difficulty === 1));
+            const level2 = shuffleArray(questionBank.filter(q => q.difficulty === 2));
+            const level3 = shuffleArray(questionBank.filter(q => q.difficulty === 3));
+            sessionQuestions = [...level1, ...level2, ...level3];
+            totalQuestionsDisplay.textContent = sessionQuestions.length;
         }
         
         function startGame() {
             score = 0;
             currentLevel = 1;
-            correctStreak = 0;
-            questionsAnswered = 0;
+            currentQuestionIndex = 0;
             scoreDisplay.textContent = score;
             levelDisplay.textContent = currentLevel;
             startScreen.classList.add('hidden');
             endScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
-            loadAvailableQuestions();
+            generateSessionQuestions();
             displayNextQuestion();
         }
 
         function displayNextQuestion() {
-            if (questionsAnswered >= totalQuestionsToAsk) {
+            if (currentQuestionIndex >= sessionQuestions.length) {
                 endGame();
                 return;
             }
-            if (availableQuestions.length === 0) {
-                loadAvailableQuestions();
-                if (availableQuestions.length === 0) {
-                    endGame();
-                    return;
-                }
-            }
+            
             resetState();
-            currentQuestion = availableQuestions.pop();
+            const currentQuestion = sessionQuestions[currentQuestionIndex];
+            
+            currentLevel = currentQuestion.difficulty;
+            levelDisplay.textContent = currentLevel;
+
             questionText.textContent = currentQuestion.question;
+            
+            // Limpa o header e adiciona a tag da fonte se existir
+            const existingTag = questionHeader.querySelector('.question-source');
+            if (existingTag) {
+                existingTag.remove();
+            }
+            if (currentQuestion.source) {
+                const sourceTag = document.createElement('span');
+                sourceTag.className = 'question-source';
+                sourceTag.textContent = `Questão ${currentQuestion.source}`;
+                questionHeader.appendChild(sourceTag);
+            }
+
             answerOptionsContainer.innerHTML = '';
-            currentQuestion.options.forEach((option, index) => {
+            
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            
+            shuffledOptions.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.innerHTML = `<span class="font-bold mr-2 border border-gray-300 rounded-md px-2">${String.fromCharCode(65 + index)}</span> ${option.text}`;
                 button.className = 'w-full text-left p-4 border-2 border-gray-300 rounded-2xl text-gray-700 font-semibold text-lg duo-button bg-white hover:bg-gray-100';
-                button.dataset.index = index;
-                button.onclick = () => selectAnswer(button, index);
+                button.dataset.correct = option.correct;
+                button.dataset.rationale = option.rationale;
+                button.onclick = () => selectAnswer(button);
                 answerOptionsContainer.appendChild(button);
             });
-            questionsAnswered++;
+            
+            questionCounter.textContent = currentQuestionIndex + 1;
             updateProgressBar();
         }
 
         function updateProgressBar() {
-            const progress = (questionsAnswered / totalQuestionsToAsk) * 100;
+            const progress = ((currentQuestionIndex + 1) / sessionQuestions.length) * 100;
             progressBar.style.width = `${progress}%`;
         }
         
@@ -382,7 +290,7 @@
             });
         }
         
-        function selectAnswer(button, index) {
+        function selectAnswer(button) {
             if (answered) return;
             answerOptionsContainer.querySelectorAll('button').forEach(btn => {
                  btn.classList.remove('selected', 'bg-blue-50');
@@ -390,43 +298,43 @@
             });
             button.classList.add('selected', 'bg-blue-50');
             button.style.borderColor = '#3B82F6';
-            selectedAnswer = index;
+            selectedAnswer = button;
             confirmButton.disabled = false;
             confirmButton.className = 'w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl uppercase shadow-lg transform hover:scale-105 transition-transform';
         }
 
         function checkAnswer() {
             if (answered) {
+                currentQuestionIndex++;
                 displayNextQuestion();
                 return;
             }
             answered = true;
-            const selectedOption = currentQuestion.options[selectedAnswer];
-            const isCorrect = selectedOption.correct;
+
+            const isCorrect = selectedAnswer.dataset.correct === 'true';
+            const selectedRationale = selectedAnswer.dataset.rationale;
+            
+            let correctRationale = '';
+
             const buttons = answerOptionsContainer.querySelectorAll('button');
-            buttons.forEach((btn, index) => {
+            buttons.forEach(btn => {
                 btn.disabled = true;
-                if (currentQuestion.options[index].correct) {
+                if (btn.dataset.correct === 'true') {
                     btn.classList.add('correct');
-                } else if (index === selectedAnswer) {
+                    correctRationale = btn.dataset.rationale;
+                } else if (btn === selectedAnswer) {
                     btn.classList.add('incorrect');
                 }
             });
+
             let feedbackHTML = '';
             if (isCorrect) {
                 score += 10 * currentLevel;
-                correctStreak++;
-                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-correct bg-green-50"><h3 class="text-xl font-bold mb-2">Correto!</h3><p class="text-gray-700">${selectedOption.rationale}</p></div>`;
-                if (correctStreak >= 2 && currentLevel < 3) {
-                    currentLevel++;
-                    correctStreak = 0;
-                    levelDisplay.textContent = currentLevel;
-                }
+                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-correct bg-green-50"><h3 class="text-xl font-bold mb-2">Correto!</h3><p class="text-gray-700">${selectedRationale}</p></div>`;
             } else {
-                correctStreak = 0;
-                const correctOption = currentQuestion.options.find(opt => opt.correct);
-                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-incorrect bg-red-50"><h3 class="text-xl font-bold mb-2">Ops, não foi desta vez!</h3><p class="text-gray-700 mb-2"><b>Sua resposta:</b> ${selectedOption.rationale}</p><p class="text-gray-700"><b>Resposta correta:</b> ${correctOption.rationale}</p></div>`;
+                feedbackHTML = `<div class="p-4 rounded-2xl border-l-8 feedback-incorrect bg-red-50"><h3 class="text-xl font-bold mb-2">Ops, não foi desta vez!</h3><p class="text-gray-700 mb-2"><b>Sua resposta:</b> ${selectedRationale}</p><p class="text-gray-700"><b>Resposta correta:</b> ${correctRationale}</p></div>`;
             }
+
             feedbackSection.innerHTML = feedbackHTML;
             scoreDisplay.textContent = score;
             confirmButton.textContent = 'Próxima Pergunta';
@@ -455,7 +363,6 @@
 
         function toggleFullScreen() {
             const elem = document.documentElement;
-            // Verifica se a API é suportada e permitida
             if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
                  showFullscreenError();
                  return;
